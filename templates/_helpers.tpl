@@ -14,15 +14,6 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Get globally common labels.
-*/}}
-{{- define "global.labels" -}}
-{{- if .Values.global.labels -}}
-{{ toYaml $.Values.global.labels }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Common labels
 */}}
 {{- define "hive-metastore.labels" -}}

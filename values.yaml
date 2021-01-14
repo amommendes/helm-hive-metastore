@@ -19,10 +19,6 @@ env:
   HIVE_DB_EXTERNAL: "false"
   HIVE_DB_NAME: metastore_db
 
-podSecurityContext: {}
-
-securityContext: {}
-
 ## Resource requests and limits: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
 resources:
   limits:
@@ -32,10 +28,13 @@ resources:
     cpu: 2
     memory: 4Gi
 
-# Service can clusterIP or loadBalancer.
-#   Please see example file to deployment with loadBalancer service in the examples directory.
 service:
-  type: clusterIP
+  type: ClusterIP
+  ports:
+    - name: thrift
+      port: 9083
+      targetPort: 9083
+      protocol: TCP
 
 ## Auto-scaling (hpa) configuration
 autoscaling:

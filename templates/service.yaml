@@ -4,25 +4,9 @@ metadata:
   name: {{ include "hive-metastore.name" . }}
   labels:
     {{- include "hive-metastore.labels" $ | trim | nindent 4 }}
-    {{- include "global.labels" $ | trim | nindent 4 }}
-  annotations:
-    {{- if (eq .Values.service.type "loadBalancer") }}
-    {{-   if .Values.service.loadBalancer.annotations }}
-    {{      toYaml .Values.service.loadBalancer.annotations | nindent 4 }}
-    {{-   end }}
-    {{- end }}
-
 
 spec:
-  {{- if (eq .Values.service.type "loadBalancer") }}
-  type: LoadBalancer
-  {{- else }}
-  type: ClusterIP
-  {{ end }}
-  ports:
-    - name: thrift
-      port: 9083
-      targetPort: 9083
-      protocol: TCP
+  {{ .Values.service.type }}
+
   selector:
     {{- include "hive-metastore.selectorLabels" . | nindent 4 }}
