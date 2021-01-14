@@ -4,7 +4,7 @@ In simple terms, [Helm](https://helm.sh/) is a package manager for Kubernetes. T
 
 ## Kubernetes Resources used in this Hive Chart
 
-The resources used in the chart are defined in yaml files inside [`/templates` directory](https://github.com/amommendes/helm-hive-metastore/tree/main/templates). For our HMS chart will use the following resources:
+The resources used in the this chart are defined in yaml files inside [`/templates` directory](https://github.com/amommendes/helm-hive-metastore/tree/main/templates). The following resources are used:
 
 - [Configmap](https://github.com/amommendes/helm-hive-metastore/blob/main/templates/configmap.yaml): this kube resource creates volumes that can be attached to containers. Here, we're mounting a volume to the [HMS configuration templates directory](https://github.com/amommendes/helm-hive-metastore/blob/main/templates/deployment.yaml#L65), which will be used by the HMS docker image to render the `metastore-site.yaml` config file.
 - [Service](https://github.com/amommendes/helm-hive-metastore/blob/main/templates/service.yaml): this resources is responsible to expose the HMS service to the external.
