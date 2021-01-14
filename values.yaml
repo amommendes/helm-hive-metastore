@@ -1,0 +1,46 @@
+---
+## You can override the default chart name (i.e., .Charts.name) when desired using the following parameter.
+## This is the only way to have more than one deployment of this
+nameOverride: null
+
+## Number of Hive Metastore instances.
+## Following the documentation, given Hive Metastore is stateless we could have more than one instance.
+## https://cwiki.apache.org/confluence/display/Hive/AdminManual+Metastore+Administration
+replicaCount: 1
+
+## Default Hive image and tag. Please build image locally before applying this.
+image:
+  name: hive-metastore
+  tag: latest
+  pullPolicy: IfNotPresent
+
+
+env:
+  HIVE_DB_EXTERNAL: "false"
+  HIVE_DB_NAME: metastore_db
+
+podSecurityContext: {}
+
+securityContext: {}
+
+## Resource requests and limits: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 2
+    memory: 4Gi
+
+# Service can clusterIP or loadBalancer.
+#   Please see example file to deployment with loadBalancer service in the examples directory.
+service:
+  type: clusterIP
+
+## Auto-scaling (hpa) configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 90
+  targetMemoryUtilizationPercentage: 90

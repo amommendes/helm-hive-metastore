@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hive-metastore.name" . }}
+  labels:
+    {{- include "hive-metastore.labels" $ | trim | nindent 4 }}
+    {{- include "global.labels" $ | trim | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "hive-metastore.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "hive-metastore.labels" $ | trim | nindent 8 }}
+        {{- include "hive-metastore.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName:  {{ template "hive-metastore.name" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{.Values.image.name}}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/opt/hive-metastore/bin/entrypoint.sh"]
+          env:
+          {{- range $key, $value := .Values.env }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+         {{- end }}
+          ports:
+            - name: tcp
+              containerPort: 9083
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9083
+          readinessProbe:
+            tcpSocket:
+              port: 9083
+          resources:
+            {{- toYaml .Values.resources | trim  | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if eq .Values.env.HIVE_DB_EXTERNAL "true" }}
+          volumeMounts:
+          - name: hive-conf-templates
+            mountPath: /opt/hive-metastore/conf/templates
+      volumes:
+      - name: hive-conf-templates
+        configMap:
+          name: {{ template "hive-metastore.name" . }}-conf-templates
+      {{- end }}
